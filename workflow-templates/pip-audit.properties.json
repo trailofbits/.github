@@ -5,10 +5,8 @@
         "Python"
     ],
     "filePatterns": [
-        // requirements.txt, dev-requirements.txt, etc
         "requirements\\.txt$",
-        // standard packaging files
         "^setup\\.py$",
-        "^pyproject\\.toml$",
+        "^pyproject\\.toml$"
     ]
 }
