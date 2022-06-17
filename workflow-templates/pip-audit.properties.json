@@ -1,0 +1,14 @@
+{
+    "name": "pip-audit",
+    "description": "Scan dependencies for vulnerabilities with pip-audit",
+    "categories": [
+        "Python"
+    ],
+    "filePatterns": [
+        // requirements.txt, dev-requirements.txt, etc
+        "requirements\\.txt$",
+        // standard packaging files
+        "^setup\\.py$",
+        "^pyproject\\.toml$",
+    ]
+}
