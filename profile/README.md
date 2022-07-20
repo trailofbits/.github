@@ -7,4 +7,11 @@ organizations and devices.
 We combine high-end security research with a
 real-world attacker mentality to reduce risk and fortify code.
 
+Some of our work:
+
+* [@trailofbits](https://github.com/trailofbits) -- Our main GitHub organization
+* [@crytic](https://github.com/crytic) -- Our blockchain security group
+* [@lifting-bits](https://github.com/lifting-bits) -- Our binary lifting research projects
+* [@trail-of-forks](https://github.com/trail-of-forks) -- Development on others' projects
+
 <br clear="left"/>
