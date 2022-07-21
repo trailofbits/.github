@@ -39,7 +39,7 @@ jobs:
 
 
       - name: Run pip-audit
-        uses: trailofbits/gh-action-pip-audit@v0.0.4
+        uses: trailofbits/gh-action-pip-audit@v0.0.6
         with:
           # IMPORTANT: You may need additional or different settings here.
           # See https://github.com/trailofbits/gh-action-pip-audit for details.
