@@ -28,7 +28,7 @@ jobs:
       # how your Python dependencies are specified.
       # You may also need to tweak it, depending on how your
       # Python package's build is configured.
-      # See https://github.com/trailofbits/gh-action-pip-audit for details.
+      # See https://github.com/pypa/gh-action-pip-audit for details.
       - name: Install project
         run: |
           python -m venv /tmp/pip-audit-env
@@ -39,9 +39,9 @@ jobs:
 
 
       - name: Run pip-audit
-        uses: trailofbits/gh-action-pip-audit@v0.0.6
+        uses: pypa/gh-action-pip-audit@v1.0.0
         with:
           # IMPORTANT: You may need additional or different settings here.
-          # See https://github.com/trailofbits/gh-action-pip-audit for details.
+          # See https://github.com/pypa/gh-action-pip-audit for details.
           virtual-environment: /tmp/pip-audit-env
 
