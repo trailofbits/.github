@@ -39,7 +39,7 @@ jobs:
 
 
       - name: Run pip-audit
-        uses: pypa/gh-action-pip-audit@v1.0.0
+        uses: pypa/gh-action-pip-audit@v1.0.1
         with:
           # IMPORTANT: You may need additional or different settings here.
           # See https://github.com/pypa/gh-action-pip-audit for details.
