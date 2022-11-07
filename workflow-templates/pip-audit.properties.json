@@ -1,6 +1,7 @@
 {
     "name": "pip-audit",
     "description": "Scan dependencies for vulnerabilities with pip-audit",
+    "iconName": "tob-default",
     "categories": [
         "Python"
     ],
