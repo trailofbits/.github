@@ -6,6 +6,11 @@ on:
         default: "make"
         required: false
         type: string
+      python-version:
+        description: "the version of Python to configure, if any (can be SemVer-formatted)"
+        default: ""
+        required: false
+        type: string
 
 jobs:
   lint:
@@ -14,15 +19,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: configure python, if required
+        if: inputs.python-version != ''
+        uses: actions/setup-python@v4
+        with:
+          python-version: "${{ inputs.python-version }}"
+
       - name: run lints
         env:
-          LINT_TYPE: "${{ inputs.type }}"
+          TOB_LINT_TYPE: "${{ inputs.type }}"
         run: |
-          if [[ "${LINT_TYPE}" == "make" ]]; then
+          if [[ "${TOB_LINT_TYPE}" == "make" ]]; then
             make lint
-          elif [[ "${LINT_TYPE}" == "rust" ]]; then
+          elif [[ "${TOB_LINT_TYPE}" == "rust" ]]; then
             cargo fmt
           else
-            >&2 echo "Fatal: unknown linting type: ${LINT_TYPE}"
+            >&2 echo "Fatal: unknown linting type: ${TOB_LINT_TYPE}"
             exit 1
           fi
