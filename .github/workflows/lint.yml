@@ -1,0 +1,28 @@
+on:
+  workflow_call:
+    inputs:
+      type:
+        description: "the expected lint entrypoint"
+        default: "make"
+        required: false
+        type: string
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: run lints
+        env:
+          LINT_TYPE: "${{ inputs.type }}"
+        run: |
+          if [[ "${LINT_TYPE}" == "make" ]]; then
+            make lint
+          elif [[ "${LINT_TYPE}" == "rust" ]]; then
+            cargo fmt
+          else
+            >&2 echo "Fatal: unknown linting type: ${LINT_TYPE}"
+            exit 1
+          fi
