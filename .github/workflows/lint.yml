@@ -27,7 +27,7 @@ jobs:
           cache: "pip"
           cache-dependency-path: pyproject.toml
 
-      - name: run lints
+      - name: run baseline lint
         env:
           TOB_LINT_TYPE: "${{ inputs.type }}"
         run: |
@@ -39,3 +39,6 @@ jobs:
             >&2 echo "Fatal: unknown linting type: ${TOB_LINT_TYPE}"
             exit 1
           fi
+
+      # TODO: other lints would go here, as configured:
+      # - LICENSE conformance (checking headers of all source files)
