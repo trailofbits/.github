@@ -27,6 +27,13 @@ jobs:
           cache: "pip"
           cache-dependency-path: pyproject.toml
 
+      - nane: configure clippy, if required
+        if: inputs.type == 'rust'
+        run: |
+          # we always run the latest stable Rust and Clippy for Rust linting.
+          rustup update
+          rustup component add clippy
+
       - name: run baseline lint
         env:
           TOB_LINT_TYPE: "${{ inputs.type }}"
@@ -34,7 +41,7 @@ jobs:
           if [[ "${TOB_LINT_TYPE}" == "make" ]]; then
             make lint
           elif [[ "${TOB_LINT_TYPE}" == "rust" ]]; then
-            cargo fmt
+            cargo clippy
           else
             >&2 echo "Fatal: unknown linting type: ${TOB_LINT_TYPE}"
             exit 1
