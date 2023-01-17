@@ -34,15 +34,14 @@ jobs:
           rustup update
           rustup component add clippy
 
-      - name: run baseline lint
-        env:
-          TOB_LINT_TYPE: "${{ inputs.type }}"
+      - name: run lint (rust)
+        uses: actions-rs/clippy-check@v1
+        if: inputs.type == 'rust'
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all-features
+
+      - name: run lint (make)
+        if: inputs.type == 'make'
         run: |
-          if [[ "${TOB_LINT_TYPE}" == "make" ]]; then
-            make lint
-          elif [[ "${TOB_LINT_TYPE}" == "rust" ]]; then
-            cargo clippy
-          else
-            >&2 echo "Fatal: unknown linting type: ${TOB_LINT_TYPE}"
-            exit 1
-          fi
+          make lint
