@@ -2,13 +2,23 @@ on:
   workflow_call:
     inputs:
       type:
-        description: "the expected lint entrypoint"
+        description: "the expected lint entrypoint: a language name or either 'make' or 'just'"
         default: "make"
         required: false
         type: string
       python-version:
         description: "the version of Python to configure, if any (can be SemVer-formatted)"
         default: ""
+        required: false
+        type: string
+      go-version-file:
+        description: "the file to get the go version from"
+        default: "go.mod"
+        required: false
+        type: string
+      golangci-lint-version:
+        description: "the golangci-lint version for Go linting"
+        default: "v1.50.1"
         required: false
         type: string
       cargo-sort:
@@ -24,6 +34,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      # Python
       - name: configure python, if required
         if: inputs.python-version != ''
         uses: actions/setup-python@v4
@@ -32,6 +43,7 @@ jobs:
           cache: "pip"
           cache-dependency-path: pyproject.toml
 
+      # Rust
       - name: configure rust and clippy, if required
         if: inputs.type == 'rust'
         run: |
@@ -58,6 +70,19 @@ jobs:
           cargo install cargo-sort
           cargo sort -c
 
+      # Go
+      - name: setup go
+        if: inputs.type == 'go'
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: "${{ inputs.go-version-file }}"
+      - name: run golangci-lint (go)
+        if: inputs.type == 'go'
+        uses: golangci/golangci-lint-action@0ad9a0988b3973e851ab0a07adf248ec2e100376 # @v3.3.1
+        with:
+          version: "${{ inputs.golangci-lint-version }}"
+
+      # Make
       - name: run lint (make)
         if: inputs.type == 'make'
         run: |
