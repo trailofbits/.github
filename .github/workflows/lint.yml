@@ -76,6 +76,7 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version-file: "${{ inputs.go-version-file }}"
+
       - name: run golangci-lint (go)
         if: inputs.type == 'go'
         uses: golangci/golangci-lint-action@0ad9a0988b3973e851ab0a07adf248ec2e100376 # @v3.3.1
@@ -85,5 +86,9 @@ jobs:
       # Make
       - name: run lint (make)
         if: inputs.type == 'make'
+        env:
+          # NOTE: If ruff is an underlying linter, this makes it generate
+          # GitHub-style annotations.
+          RUFF_FORMAT: github
         run: |
           make lint
