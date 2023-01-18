@@ -11,6 +11,11 @@ on:
         default: ""
         required: false
         type: string
+      cargo-sort:
+        description: "run cargo-sort as part of Rust linting"
+        default: false
+        required: false
+        type: boolean
 
 jobs:
   lint:
@@ -27,14 +32,14 @@ jobs:
           cache: "pip"
           cache-dependency-path: pyproject.toml
 
-      - nane: configure clippy, if required
+      - nane: configure rust and clippy, if required
         if: inputs.type == 'rust'
         run: |
           # we always run the latest stable Rust and Clippy for Rust linting.
           rustup update
           rustup component add clippy
 
-      - name: run lint (rust)
+      - name: run clippy (rust)
         # NOTE: This is a fork of the original `actions-rs/clippy-check`,
         # which is no longer maintained; the commit is pinned since no release
         # has been made and its long term maintenance status/ownership is unclear.
@@ -43,6 +48,12 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --all-features
+
+      - name: run cargo sort (rust)
+        if: inputs.type == 'rust' && inputs.cargo-sort == 'true'
+        run: |
+          cargo install cargo-sort
+          cargo sort -c
 
       - name: run lint (make)
         if: inputs.type == 'make'
