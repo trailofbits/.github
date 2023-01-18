@@ -35,6 +35,9 @@ jobs:
           rustup component add clippy
 
       - name: run lint (rust)
+        # NOTE: This is a fork of the original `actions-rs/clippy-check`,
+        # which is no longer maintained; the commit is pinned since no release
+        # has been made and its long term maintenance status/ownership is unclear.
         uses: actions-rs-plus/clippy-check@5eb300cdebee2681ff8513b9348b0ca793d8a293
         if: inputs.type == 'rust'
         with:
