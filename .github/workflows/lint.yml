@@ -50,7 +50,7 @@ jobs:
           args: --all-features
 
       - name: run cargo sort (rust)
-        if: inputs.type == 'rust' && inputs.cargo-sort == 'true'
+        if: inputs.type == 'rust' && inputs.cargo-sort
         run: |
           cargo install cargo-sort
           cargo sort -c
