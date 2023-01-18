@@ -47,7 +47,7 @@ jobs:
         if: inputs.type == 'rust'
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          args: --all-features
+          args: --all-features -- -D warnings
 
       - name: run cargo sort (rust)
         if: inputs.type == 'rust' && inputs.cargo-sort
