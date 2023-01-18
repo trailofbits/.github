@@ -27,6 +27,13 @@ on:
         required: false
         type: boolean
 
+env:
+  # Rust: GitHub Actions supports color codes, so always enable them.
+  CARGO_TERM_COLOR: always
+
+  # Python: Tell ruff that we're in GitHub Actions, so that it emits annotations.
+  RUFF_FORMAT: github
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -86,9 +93,4 @@ jobs:
       # Make
       - name: run lint (make)
         if: inputs.type == 'make'
-        env:
-          # NOTE: If ruff is an underlying linter, this makes it generate
-          # GitHub-style annotations.
-          RUFF_FORMAT: github
-        run: |
-          make lint
+        run: make lint
