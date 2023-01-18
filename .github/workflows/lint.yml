@@ -32,7 +32,7 @@ jobs:
           cache: "pip"
           cache-dependency-path: pyproject.toml
 
-      - nane: configure rust and clippy, if required
+      - name: configure rust and clippy, if required
         if: inputs.type == 'rust'
         run: |
           # we always run the latest stable Rust and Clippy for Rust linting.
