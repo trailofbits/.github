@@ -1,0 +1,96 @@
+on:
+  workflow_call:
+    inputs:
+      type:
+        description: "the expected lint entrypoint: a language name or either 'make' or 'just'"
+        default: "make"
+        required: false
+        type: string
+      python-version:
+        description: "the version of Python to configure, if any (can be SemVer-formatted)"
+        default: ""
+        required: false
+        type: string
+      go-version-file:
+        description: "the file to get the go version from"
+        default: "go.mod"
+        required: false
+        type: string
+      golangci-lint-version:
+        description: "the golangci-lint version for Go linting"
+        default: "v1.50.1"
+        required: false
+        type: string
+      cargo-sort:
+        description: "run cargo-sort as part of Rust linting"
+        default: false
+        required: false
+        type: boolean
+
+env:
+  # Rust: GitHub Actions supports color codes, so always enable them.
+  CARGO_TERM_COLOR: always
+
+  # Python: Tell ruff that we're in GitHub Actions, so that it emits annotations.
+  RUFF_FORMAT: github
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # Python
+      - name: configure python, if required
+        if: inputs.python-version != ''
+        uses: actions/setup-python@v4
+        with:
+          python-version: "${{ inputs.python-version }}"
+          cache: "pip"
+          cache-dependency-path: pyproject.toml
+
+      # Rust
+      - name: configure rust and clippy, if required
+        if: inputs.type == 'rust'
+        run: |
+          # we always run the latest stable Rust and Clippy for Rust linting.
+          rustup update
+          rustup component add clippy
+
+      - name: run rustfmt (rust)
+        if: inputs.type == 'rust'
+        run: cargo fmt --check
+
+      - name: run clippy (rust)
+        # NOTE: This is a fork of the original `actions-rs/clippy-check`,
+        # which is no longer maintained; the commit is pinned since no release
+        # has been made and its long term maintenance status/ownership is unclear.
+        uses: actions-rs-plus/clippy-check@5eb300cdebee2681ff8513b9348b0ca793d8a293
+        if: inputs.type == 'rust'
+        with:
+          args: --all-features -- -D warnings
+
+      - name: run cargo sort (rust)
+        if: inputs.type == 'rust' && inputs.cargo-sort
+        run: |
+          cargo install cargo-sort
+          cargo sort -c
+
+      # Go
+      - name: setup go
+        if: inputs.type == 'go'
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: "${{ inputs.go-version-file }}"
+
+      - name: run golangci-lint (go)
+        if: inputs.type == 'go'
+        uses: golangci/golangci-lint-action@0ad9a0988b3973e851ab0a07adf248ec2e100376 # @v3.3.1
+        with:
+          version: "${{ inputs.golangci-lint-version }}"
+
+      # Make
+      - name: run lint (make)
+        if: inputs.type == 'make'
+        run: make lint
