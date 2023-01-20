@@ -74,6 +74,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: validate input
+        run: |
+          if [ "${{ inputs.language }}" == "python" ] && [ "${{ inputs.type }}" == "github" ]; then
+            echo "you must use either make or just to run a lint target for python"
+            exit 1
+          fi
+
       # Python
       - name: configure python, if required
         if: inputs.language == 'python'
