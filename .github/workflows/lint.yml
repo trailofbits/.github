@@ -4,11 +4,12 @@ on:
       type:
         description: "the expected lint entrypoint: make, just, or github"
         default: "github"
-        required: true
+        required: false
         type: string
       language:
         description: "the language to configure"
-        required: true
+        default: ""
+        required: false
         type: string
       target:
         description: "the make or just target to run for linting"
