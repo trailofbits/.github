@@ -9,6 +9,11 @@ on:
         default: "make"
         required: false
         type: string
+      target:
+        description: "the make or just target to run for linting"
+        default: "lint"
+        required: false
+        type: string
       python-version:
         description: "the version of Python to configure, if any (can be SemVer-formatted)"
         default: ""
@@ -122,9 +127,9 @@ jobs:
       # Make
       - name: run lint (make)
         if: contains(inputs.type, 'make')
-        run: make lint
+        run: make "${{ inputs.target }}"
 
       # Just
       - name: run lint (just)
         if: contains(inputs.type, 'just')
-        run: just lint
+        run: just "${{ inputs.target }}"
