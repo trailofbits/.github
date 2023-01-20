@@ -4,7 +4,7 @@ on:
       type:
         description: "the expected lint entrypoint: make, just, or github"
         default: "github"
-        required: true
+        required: false
         type: string
       language:
         description: "the language to configure"
