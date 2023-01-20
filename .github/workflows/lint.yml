@@ -78,15 +78,6 @@ jobs:
           cache: "${{ inputs.python-cache-type }}"
           cache-dependency-path: "${{ inputs.python-cache-dependency-path }}"
 
-      - name: validate input (python)
-        if: contains(inputs.type, 'python')
-        run: |
-          if [[ "${{ inputs.python-version }}" == "" \
-            && "${{ inputs.python-version-file }}" == ""]]; then
-            echo "Must set either python-version or python-version-file"
-            exit 1
-          fi
-
       # Rust
       - name: configure rust and clippy, if required
         if: contains(inputs.type, 'rust')
@@ -121,15 +112,6 @@ jobs:
         with:
           go-version-file: "${{ inputs.go-version-file }}"
           go-version: "${{ inputs.go-version }}"
-
-      - name: validate input (go)
-        if: contains(inputs.type, 'go')
-        run: |
-          if [[ "${{ inputs.go-version }}" == "" \
-            && "${{ inputs.go-version-file }}" == ""]]; then
-            echo "Must set either go-version or go-version-file"
-            exit 1
-          fi
 
       - name: run golangci-lint (go)
         if: contains(inputs.type, 'go')
