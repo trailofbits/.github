@@ -10,6 +10,11 @@ on:
         description: "the language to configure"
         required: true
         type: string
+      continue-on-error:
+        description: "Don't mark the job as failed if a lint fails"
+        default: false
+        required: false
+        type: boolean
       target:
         description: "the make or just target to run for linting"
         default: "lint"
@@ -70,7 +75,7 @@ env:
 jobs:
   lint:
     runs-on: ubuntu-latest
-
+    continue-on-error: ${{ inputs.continue-on-error }}
     steps:
       - uses: actions/checkout@v3
 
