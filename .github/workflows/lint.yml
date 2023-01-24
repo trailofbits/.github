@@ -11,7 +11,7 @@ on:
         required: true
         type: string
       continue-on-error:
-        description: "Don't mark the job as failed if a lint fails"
+        description: "don't mark the job as failed if a lint fails"
         default: false
         required: false
         type: boolean
@@ -26,7 +26,7 @@ on:
         required: false
         type: string
       python-version-file:
-        description: "get the python version from the specified file"
+        description: "get the Python version from the specified file"
         default: ".python-version"
         required: false
         type: string
@@ -50,7 +50,7 @@ on:
         required: false
         type: string
       go-version-file:
-        description: "the file to get the go version from"
+        description: "the file to get the Go version from"
         default: "go.mod"
         required: false
         type: string
