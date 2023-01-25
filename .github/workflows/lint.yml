@@ -142,8 +142,7 @@ jobs:
         if: inputs.type == 'make'
         continue-on-error: ${{ inputs.continue-on-error }}
         run: make lint
-        with:
-          working-directory: "${{ inputs.directory }}"
+        working-directory: "${{ inputs.directory }}"
       # Just
       - name: configure just, if required
         if: inputs.type == 'just'
