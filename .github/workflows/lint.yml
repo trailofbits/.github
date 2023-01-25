@@ -75,8 +75,8 @@ jobs:
       - name: configure python, if required
         if: inputs.language == 'python'
         uses: actions/setup-python@v4
-        working-directory: "${{ inputs.directory }}"
         with:
+          working-directory: "${{ inputs.directory }}"
           python-version: "${{ inputs.python-version }}"
           python-version-file: "${{ inputs.python-version-file }}"
           cache: pip
@@ -87,12 +87,13 @@ jobs:
       # Rust
       - name: configure rust and clippy, if required
         if: inputs.language == 'rust' 
-        working-directory: "${{ inputs.directory }}"
         continue-on-error: ${{ inputs.continue-on-error }}
         run: |
           # we always run the latest stable Rust and Clippy for Rust linting.
           rustup update
           rustup component add clippy
+        with:
+          working-directory: "${{ inputs.directory }}"
 
       - name: run rustfmt (rust)
         if: inputs.language == 'rust' && inputs.type == 'github'
@@ -105,45 +106,46 @@ jobs:
         # which is no longer maintained; the commit is pinned since no release
         # has been made and its long term maintenance status/ownership is unclear.
         if: inputs.language == 'rust' && inputs.type == 'github'
-        working-directory: "${{ inputs.directory }}"
         continue-on-error: ${{ inputs.continue-on-error }}
         uses: actions-rs-plus/clippy-check@5eb300cdebee2681ff8513b9348b0ca793d8a293
         with:
+          working-directory: "${{ inputs.directory }}"
           args: --all-features -- -D warnings
 
       - name: run cargo sort (rust)
         if: inputs.language == 'rust' && inputs.type == 'github'
-        working-directory: "${{ inputs.directory }}"
         continue-on-error: ${{ inputs.continue-on-error }}
         run: |
           cargo install cargo-sort
           cargo sort -c
+        with:
+          working-directory: "${{ inputs.directory }}"
 
       # Go
       - name: configure go, if required
         if: inputs.language == 'go'
-        working-directory: "${{ inputs.directory }}"
         continue-on-error: ${{ inputs.continue-on-error }}
         uses: actions/setup-go@v3
         with:
+          working-directory: "${{ inputs.directory }}"
           go-version-file: "${{ inputs.go-version-file }}"
           go-version: "${{ inputs.go-version }}"
 
       - name: run golangci-lint (go)
         if: inputs.language == 'go' && inputs.type == 'github'
-        working-directory: "${{ inputs.directory }}"
         continue-on-error: ${{ inputs.continue-on-error }}
         uses: golangci/golangci-lint-action@0ad9a0988b3973e851ab0a07adf248ec2e100376 # @v3.3.1
         with:
+          working-directory: "${{ inputs.directory }}"
           version: "${{ inputs.golangci-lint-version }}"
 
       # Make
       - name: run lint (make)
         if: inputs.type == 'make'
-        working-directory: "${{ inputs.directory }}"
         continue-on-error: ${{ inputs.continue-on-error }}
         run: make lint
-
+        with:
+          working-directory: "${{ inputs.directory }}"
       # Just
       - name: configure just, if required
         if: inputs.type == 'just'
@@ -153,3 +155,5 @@ jobs:
         if: inputs.type == 'just'
         continue-on-error: ${{ inputs.continue-on-error }}
         run: just lint
+        with:
+          working-directory: "${{ inputs.directory }}"
