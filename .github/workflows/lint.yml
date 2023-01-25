@@ -20,11 +20,6 @@ on:
         default: false
         required: false
         type: boolean
-      target:
-        description: "the make or just target to run for linting"
-        default: "lint"
-        required: false
-        type: string
       python-version:
         description: "the version of Python to configure, if any (can be SemVer-formatted)"
         default: ""
@@ -143,7 +138,7 @@ jobs:
       - name: run lint (make)
         if: inputs.type == 'make'
         continue-on-error: ${{ inputs.continue-on-error }}
-        run: make "${{ inputs.target }}"
+        run: make lint
 
       # Just
       - name: configure just, if required
@@ -152,4 +147,4 @@ jobs:
       - name: run lint (just)
         if: inputs.type == 'just'
         continue-on-error: ${{ inputs.continue-on-error }}
-        run: just "${{ inputs.target }}"
+        run: just lint
