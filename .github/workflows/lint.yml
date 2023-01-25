@@ -88,17 +88,16 @@ jobs:
       - name: configure rust and clippy, if required
         if: inputs.language == 'rust' 
         continue-on-error: ${{ inputs.continue-on-error }}
+        working-directory: "${{ inputs.directory }}"
         run: |
           # we always run the latest stable Rust and Clippy for Rust linting.
           rustup update
           rustup component add clippy
-        with:
-          working-directory: "${{ inputs.directory }}"
 
       - name: run rustfmt (rust)
         if: inputs.language == 'rust' && inputs.type == 'github'
-        working-directory: "${{ inputs.directory }}"
         continue-on-error: ${{ inputs.continue-on-error }}
+        working-directory: "${{ inputs.directory }}"
         run: cargo fmt --check
 
       - name: run clippy (rust)
@@ -109,17 +108,16 @@ jobs:
         continue-on-error: ${{ inputs.continue-on-error }}
         uses: actions-rs-plus/clippy-check@5eb300cdebee2681ff8513b9348b0ca793d8a293
         with:
-          working-directory: "${{ inputs.directory }}"
           args: --all-features -- -D warnings
+          working-directory: "${{ inputs.directory }}"
 
       - name: run cargo sort (rust)
         if: inputs.language == 'rust' && inputs.type == 'github'
         continue-on-error: ${{ inputs.continue-on-error }}
+        working-directory: "${{ inputs.directory }}"
         run: |
           cargo install cargo-sort
           cargo sort -c
-        with:
-          working-directory: "${{ inputs.directory }}"
 
       # Go
       - name: configure go, if required
@@ -127,17 +125,17 @@ jobs:
         continue-on-error: ${{ inputs.continue-on-error }}
         uses: actions/setup-go@v3
         with:
-          working-directory: "${{ inputs.directory }}"
           go-version-file: "${{ inputs.go-version-file }}"
           go-version: "${{ inputs.go-version }}"
+          working-directory: "${{ inputs.directory }}"
 
       - name: run golangci-lint (go)
         if: inputs.language == 'go' && inputs.type == 'github'
         continue-on-error: ${{ inputs.continue-on-error }}
         uses: golangci/golangci-lint-action@0ad9a0988b3973e851ab0a07adf248ec2e100376 # @v3.3.1
         with:
-          working-directory: "${{ inputs.directory }}"
           version: "${{ inputs.golangci-lint-version }}"
+          working-directory: "${{ inputs.directory }}"
 
       # Make
       - name: run lint (make)
@@ -149,11 +147,9 @@ jobs:
       # Just
       - name: configure just, if required
         if: inputs.type == 'just'
-        working-directory: "${{ inputs.directory }}"
         run: cargo install just
       - name: run lint (just)
         if: inputs.type == 'just'
         continue-on-error: ${{ inputs.continue-on-error }}
         run: just lint
-        with:
-          working-directory: "${{ inputs.directory }}"
+        working-directory: "${{ inputs.directory }}"
