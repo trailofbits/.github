@@ -10,6 +10,11 @@ on:
         description: "the language to configure"
         required: true
         type: string
+      directory:
+        description: "the directory to run the lint in"
+        required: false
+        type: string
+        default: ${{ github.workspace }}
       continue-on-error:
         description: "don't mark the job as failed if a lint fails"
         default: false
@@ -28,20 +33,6 @@ on:
       python-version-file:
         description: "get the Python version from the specified file"
         default: ".python-version"
-        required: false
-        type: string
-      python-cache-dependency-path:
-        description: "the file(s) where dependencies are defined: pyproject.toml, requirements.txt, poetry.lock"
-        default: |
-          **/pyproject.toml
-          **/requirements*.txt
-          **/Pipfile.lock
-          **/poetry.lock
-        required: false
-        type: string
-      python-cache-type:
-        description: "the Python cache type: pip, poetry, pipenv"
-        default: "pip"
         required: false
         type: string
       go-version:
@@ -72,6 +63,10 @@ env:
   # Python: Tell ruff that we're in GitHub Actions, so that it emits annotations.
   RUFF_FORMAT: github
 
+defaults:
+  run:
+    working-directory: "${{ inputs.directory }}"
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -92,8 +87,10 @@ jobs:
         with:
           python-version: "${{ inputs.python-version }}"
           python-version-file: "${{ inputs.python-version-file }}"
-          cache: "${{ inputs.python-cache-type }}"
-          cache-dependency-path: "${{ inputs.python-cache-dependency-path }}"
+          cache: pip
+          cache-dependency-path: |
+            **/pyproject.toml
+            **/requirements*.txt
 
       # Rust
       - name: configure rust and clippy, if required
