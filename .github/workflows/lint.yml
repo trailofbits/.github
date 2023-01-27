@@ -2,18 +2,32 @@ on:
   workflow_call:
     inputs:
       type:
-        description: "the expected lint entrypoint: a language name or either 'make' or 'just'"
-        default: "make"
+        description: "the expected lint entrypoint (derived from language by default)"
+        default: ""
         required: false
         type: string
+      language:
+        description: "the language to configure"
+        required: true
+        type: string
+      directory:
+        description: "the directory to run the lint in"
+        required: false
+        type: string
+        default: ${{ github.workspace }}
+      continue-on-error:
+        description: "don't mark the job as failed if a lint fails"
+        default: false
+        required: false
+        type: boolean
       python-version:
         description: "the version of Python to configure, if any (can be SemVer-formatted)"
         default: ""
         required: false
         type: string
-      go-version-file:
-        description: "the file to get the go version from"
-        default: "go.mod"
+      go-version:
+        description: "the Go version"
+        default: ""
         required: false
         type: string
       golangci-lint-version:
@@ -34,63 +48,95 @@ env:
   # Python: Tell ruff that we're in GitHub Actions, so that it emits annotations.
   RUFF_FORMAT: github
 
+  # Python: Make-based linting workflows use `INSTALL_EXTRA` to optimize
+  # the subset of development dependencies installed.
+  INSTALL_EXTRA: lint
+
 jobs:
   lint:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
 
       # Python
       - name: configure python, if required
-        if: inputs.python-version != ''
+        if: inputs.language == 'python'
         uses: actions/setup-python@v4
         with:
           python-version: "${{ inputs.python-version }}"
-          cache: "pip"
-          cache-dependency-path: pyproject.toml
+          python-version-file: "${{ inputs.directory }}/.python-version"
+          cache: pip
+          cache-dependency-path: |
+            **/pyproject.toml
+            **/requirements*.txt
 
       # Rust
       - name: configure rust and clippy, if required
-        if: inputs.type == 'rust'
+        if: inputs.language == 'rust'
+        continue-on-error: ${{ inputs.continue-on-error }}
+        working-directory: "${{ inputs.directory }}"
         run: |
           # we always run the latest stable Rust and Clippy for Rust linting.
           rustup update
           rustup component add clippy
 
       - name: run rustfmt (rust)
-        if: inputs.type == 'rust'
+        if: inputs.language == 'rust' && inputs.type == ''
+        continue-on-error: ${{ inputs.continue-on-error }}
+        working-directory: "${{ inputs.directory }}"
         run: cargo fmt --check
 
       - name: run clippy (rust)
         # NOTE: This is a fork of the original `actions-rs/clippy-check`,
         # which is no longer maintained; the commit is pinned since no release
         # has been made and its long term maintenance status/ownership is unclear.
+        if: inputs.language == 'rust' && inputs.type == ''
+        continue-on-error: ${{ inputs.continue-on-error }}
         uses: actions-rs-plus/clippy-check@5eb300cdebee2681ff8513b9348b0ca793d8a293
-        if: inputs.type == 'rust'
         with:
           args: --all-features -- -D warnings
+          working-directory: "${{ inputs.directory }}"
 
       - name: run cargo sort (rust)
-        if: inputs.type == 'rust' && inputs.cargo-sort
+        if: inputs.language == 'rust' && inputs.type == ''
+        continue-on-error: ${{ inputs.continue-on-error }}
+        working-directory: "${{ inputs.directory }}"
         run: |
           cargo install cargo-sort
           cargo sort -c
 
       # Go
-      - name: setup go
-        if: inputs.type == 'go'
+      - name: configure go, if required
+        if: inputs.language == 'go'
+        continue-on-error: ${{ inputs.continue-on-error }}
         uses: actions/setup-go@v3
         with:
-          go-version-file: "${{ inputs.go-version-file }}"
+          go-version-file: "${{ inputs.directory }}/go.mod"
+          go-version: "${{ inputs.go-version }}"
+          working-directory: "${{ inputs.directory }}"
 
       - name: run golangci-lint (go)
-        if: inputs.type == 'go'
+        if: inputs.language == 'go' && inputs.type == ''
+        continue-on-error: ${{ inputs.continue-on-error }}
         uses: golangci/golangci-lint-action@0ad9a0988b3973e851ab0a07adf248ec2e100376 # @v3.3.1
         with:
           version: "${{ inputs.golangci-lint-version }}"
+          working-directory: "${{ inputs.directory }}"
 
       # Make
       - name: run lint (make)
-        if: inputs.type == 'make'
+        if: (inputs.language == 'python' && inputs.type == '') || inputs.type == 'make'
+        continue-on-error: ${{ inputs.continue-on-error }}
         run: make lint
+        working-directory: "${{ inputs.directory }}"
+
+      # Just
+      - name: configure just, if required
+        if: inputs.type == 'just'
+        run: cargo install just
+
+      - name: run lint (just)
+        if: inputs.type == 'just'
+        continue-on-error: ${{ inputs.continue-on-error }}
+        run: just lint
+        working-directory: "${{ inputs.directory }}"
