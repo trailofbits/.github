@@ -42,6 +42,9 @@ on:
         type: boolean
 
 env:
+  THIS_REPO: ${{ github.action_repo }}
+  THIS_REF: ${{ github.action_ref }}
+
   # Rust: GitHub Actions supports color codes, so always enable them.
   CARGO_TERM_COLOR: always
 
@@ -126,12 +129,9 @@ jobs:
       # Markdown
       - name: download markdownlint config
         if: inputs.language == 'markdown'
-        env:
-          ACTION_REPO: ${{ github.action_repository }}
-          ACTION_REF: ${{ github.action_ref }}
         # TODO: There is almost certainly a better way to do this.
         run: |
-          config_url="https://raw.githubusercontent.com/${ACTION_REPO}/${ACTION_REF}/configs/default.markdownlint.jsonc"
+          config_url="https://raw.githubusercontent.com/${THIS_REPO}/${THIS_REF}/configs/default.markdownlint.jsonc"
           curl "${config_url}" > /tmp/default.markdownlist.jsonc
 
       - name: run markdownlint-cli2
