@@ -25,11 +25,6 @@ on:
         default: ""
         required: false
         type: string
-      python-version-file:
-        description: "get the Python version from the specified file"
-        default: ".python-version"
-        required: false
-        type: string
       go-version:
         description: "the Go version"
         default: ""
@@ -64,9 +59,8 @@ jobs:
         if: inputs.language == 'python'
         uses: actions/setup-python@v4
         with:
-          working-directory: "${{ inputs.directory }}"
           python-version: "${{ inputs.python-version }}"
-          python-version-file: "${{ inputs.python-version-file }}"
+          python-version-file: "${{ inputs.directory }}/.python-version"
           cache: pip
           cache-dependency-path: |
             **/pyproject.toml
