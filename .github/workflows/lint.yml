@@ -65,8 +65,11 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: validate input
+        env:
+          INPUT_LANGUAGE: "${{ inputs.language }}"
+          INPUT_TYPE: "${{ inputs.type }}"
         run: |
-          if [ "${{ inputs.language }}" == "python" ] && [ "${{ inputs.type }}" == "github" ]; then
+          if [ "${INPUT_LANGUAGE}" == "python" ] && [ "${INPUT_TYPE}" == "github" ]; then
             echo "you must use either make or just to run a lint target for python"
             exit 1
           fi
@@ -86,7 +89,7 @@ jobs:
 
       # Rust
       - name: configure rust and clippy, if required
-        if: inputs.language == 'rust' 
+        if: inputs.language == 'rust'
         continue-on-error: ${{ inputs.continue-on-error }}
         working-directory: "${{ inputs.directory }}"
         run: |
@@ -141,12 +144,18 @@ jobs:
       - name: run lint (make)
         if: inputs.type == 'make'
         continue-on-error: ${{ inputs.continue-on-error }}
-        run: make lint
+        # NOTE: INSTALL_EXTRA is an optimization that many of our Python packages use:
+        # it limits the dependency set to just the specified extra, in this case `lint`.
+        # It has no effect on non-Python lint suites.
+        run: |
+          make lint INSTALL_EXTRA=lint
         working-directory: "${{ inputs.directory }}"
+
       # Just
       - name: configure just, if required
         if: inputs.type == 'just'
         run: cargo install just
+
       - name: run lint (just)
         if: inputs.type == 'just'
         continue-on-error: ${{ inputs.continue-on-error }}
