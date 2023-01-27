@@ -40,16 +40,8 @@ on:
         default: false
         required: false
         type: boolean
-      internal-action-repo:
-        default: "${{ github.action_repo }}"
-        type: string
-      internal-action-ref:
-        default: "${{ github.action_ref }}"
-        type: string
-env:
-  THIS_REPO: ${{ inputs.internal-action-repo }}
-  THIS_REF: ${{ inputs.internal-action-ref }}
 
+env:
   # Rust: GitHub Actions supports color codes, so always enable them.
   CARGO_TERM_COLOR: always
 
@@ -59,6 +51,9 @@ env:
   # Python: Make-based linting workflows use `INSTALL_EXTRA` to optimize
   # the subset of development dependencies installed.
   INSTALL_EXTRA: lint
+
+  THIS_REPO: ${{ github.action_repo }}
+  THIS_REF: ${{ github.action_ref }}
 
 jobs:
   lint:
@@ -134,9 +129,11 @@ jobs:
       # Markdown
       - name: download markdownlint config
         if: inputs.language == 'markdown'
+        env:
+          THIS_REF: ${{ github.job_workflow_sha }}
         # TODO: There is almost certainly a better way to do this.
         run: |
-          config_url="https://raw.githubusercontent.com/${THIS_REPO}/${THIS_REF}/configs/default.markdownlint.jsonc"
+          config_url="https://raw.githubusercontent.com/trailofbits/.github/${THIS_REF}/configs/default.markdownlint.jsonc"
           curl "${config_url}" > /tmp/default.markdownlist.jsonc
 
       - name: run markdownlint-cli2
