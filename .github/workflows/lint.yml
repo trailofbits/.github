@@ -2,8 +2,8 @@ on:
   workflow_call:
     inputs:
       type:
-        description: "the expected lint entrypoint: make, just, or github"
-        default: "github"
+        description: "the expected lint entrypoint (derived from language by default)"
+        default: ""
         required: false
         type: string
       language:
@@ -59,16 +59,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: validate input
-        env:
-          INPUT_LANGUAGE: "${{ inputs.language }}"
-          INPUT_TYPE: "${{ inputs.type }}"
-        run: |
-          if [ "${INPUT_LANGUAGE}" == "python" ] && [ "${INPUT_TYPE}" == "github" ]; then
-            echo "you must use either make or just to run a lint target for python"
-            exit 1
-          fi
-
       # Python
       - name: configure python, if required
         if: inputs.language == 'python'
@@ -93,7 +83,7 @@ jobs:
           rustup component add clippy
 
       - name: run rustfmt (rust)
-        if: inputs.language == 'rust' && inputs.type == 'github'
+        if: inputs.language == 'rust' && inputs.type == ''
         continue-on-error: ${{ inputs.continue-on-error }}
         working-directory: "${{ inputs.directory }}"
         run: cargo fmt --check
@@ -102,7 +92,7 @@ jobs:
         # NOTE: This is a fork of the original `actions-rs/clippy-check`,
         # which is no longer maintained; the commit is pinned since no release
         # has been made and its long term maintenance status/ownership is unclear.
-        if: inputs.language == 'rust' && inputs.type == 'github'
+        if: inputs.language == 'rust' && inputs.type == ''
         continue-on-error: ${{ inputs.continue-on-error }}
         uses: actions-rs-plus/clippy-check@5eb300cdebee2681ff8513b9348b0ca793d8a293
         with:
@@ -110,7 +100,7 @@ jobs:
           working-directory: "${{ inputs.directory }}"
 
       - name: run cargo sort (rust)
-        if: inputs.language == 'rust' && inputs.type == 'github'
+        if: inputs.language == 'rust' && inputs.type == ''
         continue-on-error: ${{ inputs.continue-on-error }}
         working-directory: "${{ inputs.directory }}"
         run: |
@@ -128,7 +118,7 @@ jobs:
           working-directory: "${{ inputs.directory }}"
 
       - name: run golangci-lint (go)
-        if: inputs.language == 'go' && inputs.type == 'github'
+        if: inputs.language == 'go' && inputs.type == ''
         continue-on-error: ${{ inputs.continue-on-error }}
         uses: golangci/golangci-lint-action@0ad9a0988b3973e851ab0a07adf248ec2e100376 # @v3.3.1
         with:
@@ -137,7 +127,7 @@ jobs:
 
       # Make
       - name: run lint (make)
-        if: inputs.type == 'make'
+        if: (inputs.language == 'python' && inputs.type == '') || inputs.type == 'make'
         continue-on-error: ${{ inputs.continue-on-error }}
         # NOTE: INSTALL_EXTRA is an optimization that many of our Python packages use:
         # it limits the dependency set to just the specified extra, in this case `lint`.
