@@ -123,6 +123,13 @@ jobs:
           version: "${{ inputs.golangci-lint-version }}"
           working-directory: "${{ inputs.directory }}"
 
+      # Markdown
+      - name: run markdownlint-cli2
+        if: inputs.language == 'markdown'
+        uses: DavidAnson/markdownlint-cli2-action@v9
+        with:
+          globs: '**/*.md'
+
       # Make
       - name: run lint (make)
         if: (inputs.language == 'python' && inputs.type == '') || inputs.type == 'make'
