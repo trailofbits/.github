@@ -124,11 +124,24 @@ jobs:
           working-directory: "${{ inputs.directory }}"
 
       # Markdown
+      - name: download markdownlint config
+        if: inputs.language == 'markdown'
+        env:
+          ACTION_REPO: ${{ github.action_repository }}
+          ACTION_REF: ${{ github.action_ref }}
+        # TODO: There is almost certainly a better way to do this.
+        run: |
+          config_url="https://raw.githubusercontent.com/${ACTION_REPO}/${ACTION_REF}/configs/default.markdownlint.jsonc"
+          curl "${config_url}" > /tmp/default.markdownlist.jsonc
+
       - name: run markdownlint-cli2
         if: inputs.language == 'markdown'
         uses: DavidAnson/markdownlint-cli2-action@v9
         with:
-          globs: '**/*.md'
+          command: config
+          globs: |
+            /tmp/default.markdownlint.jsonc
+            **/*.md
 
       # Make
       - name: run lint (make)
