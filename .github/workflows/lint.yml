@@ -48,6 +48,10 @@ env:
   # Python: Tell ruff that we're in GitHub Actions, so that it emits annotations.
   RUFF_FORMAT: github
 
+  # Python: Make-based linting workflows use `INSTALL_EXTRA` to optimize
+  # the subset of development dependencies installed.
+  INSTALL_EXTRA: lint
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -123,11 +127,7 @@ jobs:
       - name: run lint (make)
         if: (inputs.language == 'python' && inputs.type == '') || inputs.type == 'make'
         continue-on-error: ${{ inputs.continue-on-error }}
-        # NOTE: INSTALL_EXTRA is an optimization that many of our Python packages use:
-        # it limits the dependency set to just the specified extra, in this case `lint`.
-        # It has no effect on non-Python lint suites.
-        run: |
-          make lint INSTALL_EXTRA=lint
+        run: make lint
         working-directory: "${{ inputs.directory }}"
 
       # Just
