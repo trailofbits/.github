@@ -40,10 +40,15 @@ on:
         default: false
         required: false
         type: boolean
-
+      internal-action-repo:
+        default: "${{ github.action_repo }}"
+        type: string
+      internal-action-ref:
+        default: "${{ github.action_ref }}"
+        type: string
 env:
-  THIS_REPO: ${{ github.action_repo }}
-  THIS_REF: ${{ github.action_ref }}
+  THIS_REPO: ${{ inputs.internal-action-repo }}
+  THIS_REF: ${{ inputs.internal-action-ref }}
 
   # Rust: GitHub Actions supports color codes, so always enable them.
   CARGO_TERM_COLOR: always
