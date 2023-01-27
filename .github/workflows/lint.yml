@@ -56,7 +56,7 @@ env:
   CARGO_TERM_COLOR: always
 
   # Python: Tell ruff that we're in GitHub Actions, so that it emits annotations.
-  RUFF_FORMAT: github 
+  RUFF_FORMAT: github
 
 jobs:
   lint:
