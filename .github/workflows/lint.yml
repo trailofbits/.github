@@ -53,7 +53,7 @@ env:
   INSTALL_EXTRA: lint
 
   ORG_REPO: trailofbits.com/.github
-  ORG_REPO_REF: ${{ github.job_workflow_sha }}
+  ORG_REPO_REF: ww/markdownlint
   ORG_REPO_PATH: tmp/org_github
 
 jobs:
