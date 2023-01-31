@@ -52,14 +52,20 @@ env:
   # the subset of development dependencies installed.
   INSTALL_EXTRA: lint
 
-  THIS_REPO: ${{ github.action_repo }}
-  THIS_REF: ${{ github.action_ref }}
+  ORG_REPO: trailofbits.com/.github
+  ORG_REPO_REF: ${{ github.job_workflow_sha }}
+  ORG_REPO_PATH: /tmp/org_github
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+        with:
+          repository: ${ORG_REPO}
+          ref: ${ORG_REPO_REF}
+          path: ${ORG_REPO_PATH}
 
       # Python
       - name: configure python, if required
@@ -127,22 +133,13 @@ jobs:
           working-directory: "${{ inputs.directory }}"
 
       # Markdown
-      - name: download markdownlint config
-        if: inputs.language == 'markdown'
-        env:
-          THIS_REF: ${{ github.job_workflow_sha }}
-        # TODO: There is almost certainly a better way to do this.
-        run: |
-          config_url="https://raw.githubusercontent.com/trailofbits/.github/${THIS_REF}/configs/default.markdownlint.jsonc"
-          curl "${config_url}" > /tmp/default.markdownlist.jsonc
-
       - name: run markdownlint-cli2
         if: inputs.language == 'markdown'
         uses: DavidAnson/markdownlint-cli2-action@v9
         with:
           command: config
           globs: |
-            /tmp/default.markdownlint.jsonc
+            ${ORG_REPO_PATH}/configs/default.markdownlint.jsonc
             **/*.md
 
       # Make
