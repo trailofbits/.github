@@ -52,7 +52,7 @@ env:
   # the subset of development dependencies installed.
   INSTALL_EXTRA: lint
 
-  ORG_REPO: trailofbits.com/.github
+  ORG_REPO: trailofbits/.github
   ORG_REPO_REF: ww/markdownlint
   ORG_REPO_PATH: tmp/org_github
 
