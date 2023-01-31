@@ -40,6 +40,11 @@ on:
         default: false
         required: false
         type: boolean
+      org-repo-ref:
+        description: "the ref: branch or commit to use of the org repo"
+        default: "main"
+        required: false
+        type: string
 
 env:
   # Rust: GitHub Actions supports color codes, so always enable them.
@@ -51,6 +56,9 @@ env:
   # Python: Make-based linting workflows use `INSTALL_EXTRA` to optimize
   # the subset of development dependencies installed.
   INSTALL_EXTRA: lint
+
+  ORG_REPO: trailofbits/.github
+  ORG_REPO_REF: ${{ inputs.org-repo-ref }}
 
 jobs:
   lint:
@@ -122,6 +130,23 @@ jobs:
         with:
           version: "${{ inputs.golangci-lint-version }}"
           working-directory: "${{ inputs.directory }}"
+
+      # Markdown
+      - name: download markdownlint config
+        if: inputs.language == 'markdown'
+        run: |
+          curl \
+            https://raw.githubusercontent.com/${{ env.ORG_REPO }}/${{ env.ORG_REPO_REF }}/configs/default.markdownlint.jsonc \
+              > /tmp/default.markdownlint.jsonc
+
+      - name: run markdownlint-cli2
+        if: inputs.language == 'markdown'
+        uses: DavidAnson/markdownlint-cli2-action@v9
+        with:
+          command: config
+          globs: |
+            /tmp/default.markdownlint.jsonc
+            **/*.md
 
       # Make
       - name: run lint (make)
