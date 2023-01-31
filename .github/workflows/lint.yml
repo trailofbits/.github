@@ -59,18 +59,12 @@ env:
 
   ORG_REPO: trailofbits/.github
   ORG_REPO_REF: ${{ inputs.org-repo-ref }}
-  ORG_REPO_PATH: /tmp/org_github
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/checkout@v3
-        with:
-          repository: ${{ env.ORG_REPO }}
-          ref: ${{ env.ORG_REPO_REF }}
-          path: ${{ env.ORG_REPO_PATH }}
 
       # Python
       - name: configure python, if required
@@ -138,13 +132,20 @@ jobs:
           working-directory: "${{ inputs.directory }}"
 
       # Markdown
+      - name: download markdownlint config
+        if: inputs.language == 'markdown'
+        run: |
+          curl \
+            https://raw.githubusercontent.com/${{ env.ORG_REPO }}/${{ env.ORG_REPO_REF }}/configs/default.markdownlint.jsonc \
+              > /tmp/default.markdownlint.jsonc
+
       - name: run markdownlint-cli2
         if: inputs.language == 'markdown'
         uses: DavidAnson/markdownlint-cli2-action@v9
         with:
           command: config
           globs: |
-            ${{env.ORG_REPO_PATH}}/configs/default.markdownlint.jsonc
+            /tmp/default.markdownlint.jsonc
             **/*.md
 
       # Make
