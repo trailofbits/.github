@@ -40,6 +40,11 @@ on:
         default: false
         required: false
         type: boolean
+      org-repo-ref:
+        description: "the ref: branch or commit to use of the org repo"
+        default: "main"
+        required: false
+        type: string
 
 env:
   # Rust: GitHub Actions supports color codes, so always enable them.
@@ -53,7 +58,7 @@ env:
   INSTALL_EXTRA: lint
 
   ORG_REPO: trailofbits/.github
-  ORG_REPO_REF: ${{ github.job_workflow_sha	}}
+  ORG_REPO_REF: ${{ inputs.org-repo-ref }}
   ORG_REPO_PATH: tmp/org_github
 
 jobs:
