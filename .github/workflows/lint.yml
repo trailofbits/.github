@@ -59,7 +59,7 @@ env:
 
   ORG_REPO: trailofbits/.github
   ORG_REPO_REF: ${{ inputs.org-repo-ref }}
-  ORG_REPO_PATH: tmp/org_github
+  ORG_REPO_PATH: /tmp/org_github
 
 jobs:
   lint:
@@ -70,7 +70,8 @@ jobs:
         with:
           repository: ${{env.ORG_REPO}}
           ref: ${{env.ORG_REPO_REF}}
-          path: ${{env.ORG_REPO_PATH}}
+          path: tmp/org_repo
+      - run: mv tmp/org_repo ${ORG_REPO_PATH}
 
       # Python
       - name: configure python, if required
