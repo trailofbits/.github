@@ -68,10 +68,9 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/checkout@v3
         with:
-          repository: ${{env.ORG_REPO}}
-          ref: ${{env.ORG_REPO_REF}}
-          path: tmp/org_repo
-      - run: mv tmp/org_repo ${ORG_REPO_PATH}
+          repository: ${{ env.ORG_REPO }}
+          ref: ${{ env.ORG_REPO_REF }}
+          path: ${{ env.ORG_REPO_PATH }}
 
       # Python
       - name: configure python, if required
