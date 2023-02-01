@@ -14,7 +14,7 @@ on:
         description: "the directory to run the lint in"
         required: false
         type: string
-        default: ${{ github.workspace }}
+        default: "."
       continue-on-error:
         description: "don't mark the job as failed if a lint fails"
         default: false
@@ -121,7 +121,6 @@ jobs:
         with:
           go-version-file: "${{ inputs.directory }}/go.mod"
           go-version: "${{ inputs.go-version }}"
-          working-directory: "${{ inputs.directory }}"
 
       - name: run golangci-lint (go)
         if: inputs.language == 'go' && inputs.type == ''
