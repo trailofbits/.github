@@ -140,6 +140,7 @@ jobs:
 
       - name: run markdownlint-cli2
         if: inputs.language == 'markdown'
+        continue-on-error: ${{ inputs.continue-on-error }}
         uses: DavidAnson/markdownlint-cli2-action@v9
         with:
           command: config
