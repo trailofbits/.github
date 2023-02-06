@@ -1,5 +1,13 @@
 on:
   workflow_call:
+    inputs:
+      type:
+        description: "use make or just to install project dependencies"
+        required: false
+        type: choice
+        options:
+          - make
+          - just
 
 jobs:
   lint:
@@ -9,13 +17,17 @@ jobs:
     steps:
       - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # pin@v3
 
-      - name: Setup just
-        uses: extractions/setup-just@95b912dc5d3ed106a72907f2f9b91e76d60bdb76 # pin@v1
+      - name: install just, if required
+        if: inputs.type == 'just'
+        run: cargo install just
 
-      - name: Install Dependencies and Build
-        run: just dev || make dev
-        # not every language needs to install dependencies
-        continue-on-error: true
+      - name: install dependencies with make, if required
+        if: inputs.type == 'make'
+        run: make deps
 
-      - name: Trunk Check
+      - name: install dependencies with just, if required
+        if: inputs.type == 'just'
+        run: just deps
+
+      - name: trunk check
         uses: trunk-io/trunk-action@9cf65e08e822e9842fd9ef7ed2a2bd9092de0986 # pin@v1
