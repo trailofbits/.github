@@ -4,10 +4,7 @@ on:
       type:
         description: "use make or just to install project dependencies"
         required: false
-        type: choice
-        options:
-          - make
-          - just
+        type: string
 
 jobs:
   lint:
