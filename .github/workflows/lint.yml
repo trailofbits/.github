@@ -1,167 +1,21 @@
 on:
   workflow_call:
-    inputs:
-      type:
-        description: "the expected lint entrypoint (derived from language by default)"
-        default: ""
-        required: false
-        type: string
-      language:
-        description: "the language to configure"
-        required: true
-        type: string
-      directory:
-        description: "the directory to run the lint in"
-        required: false
-        type: string
-        default: "."
-      continue-on-error:
-        description: "don't mark the job as failed if a lint fails"
-        default: false
-        required: false
-        type: boolean
-      python-version:
-        description: "the version of Python to configure, if any (can be SemVer-formatted)"
-        default: ""
-        required: false
-        type: string
-      go-version:
-        description: "the Go version"
-        default: ""
-        required: false
-        type: string
-      golangci-lint-version:
-        description: "the golangci-lint version for Go linting"
-        default: "v1.50.1"
-        required: false
-        type: string
-      cargo-sort:
-        description: "run cargo-sort as part of Rust linting"
-        default: false
-        required: false
-        type: boolean
-      org-repo-ref:
-        description: "the ref: branch or commit to use of the org repo"
-        default: "main"
-        required: false
-        type: string
-
-env:
-  # Rust: GitHub Actions supports color codes, so always enable them.
-  CARGO_TERM_COLOR: always
-
-  # Python: Tell ruff that we're in GitHub Actions, so that it emits annotations.
-  RUFF_FORMAT: github
-
-  # Python: Make-based linting workflows use `INSTALL_EXTRA` to optimize
-  # the subset of development dependencies installed.
-  INSTALL_EXTRA: lint
-
-  ORG_REPO: trailofbits/.github
-  ORG_REPO_REF: ${{ inputs.org-repo-ref }}
 
 jobs:
   lint:
+    name: Lint
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # pin@v3
 
-      # Python
-      - name: configure python, if required
-        if: inputs.language == 'python'
-        uses: actions/setup-python@v4
-        with:
-          python-version: "${{ inputs.python-version }}"
-          python-version-file: "${{ inputs.directory }}/.python-version"
-          cache: pip
-          cache-dependency-path: |
-            **/pyproject.toml
-            **/requirements*.txt
+      - name: Setup just
+        uses: extractions/setup-just@95b912dc5d3ed106a72907f2f9b91e76d60bdb76 # pin@v1
 
-      # Rust
-      - name: configure rust and clippy, if required
-        if: inputs.language == 'rust'
-        continue-on-error: ${{ inputs.continue-on-error }}
-        working-directory: "${{ inputs.directory }}"
-        run: |
-          # we always run the latest stable Rust and Clippy for Rust linting.
-          rustup update
-          rustup component add clippy
+      - name: Install Dependencies and Build
+        run: just dev || make dev
+        # not every language needs to install dependencies
+        continue-on-error: true
 
-      - name: run rustfmt (rust)
-        if: inputs.language == 'rust' && inputs.type == ''
-        continue-on-error: ${{ inputs.continue-on-error }}
-        working-directory: "${{ inputs.directory }}"
-        run: cargo fmt --check
-
-      - name: run clippy (rust)
-        # NOTE: This is a fork of the original `actions-rs/clippy-check`,
-        # which is no longer maintained; the commit is pinned since no release
-        # has been made and its long term maintenance status/ownership is unclear.
-        if: inputs.language == 'rust' && inputs.type == ''
-        continue-on-error: ${{ inputs.continue-on-error }}
-        uses: actions-rs-plus/clippy-check@5eb300cdebee2681ff8513b9348b0ca793d8a293
-        with:
-          args: --all-features -- -D warnings
-          working-directory: "${{ inputs.directory }}"
-
-      - name: run cargo sort (rust)
-        if: inputs.language == 'rust' && inputs.type == ''
-        continue-on-error: ${{ inputs.continue-on-error }}
-        working-directory: "${{ inputs.directory }}"
-        run: |
-          cargo install cargo-sort
-          cargo sort -c
-
-      # Go
-      - name: configure go, if required
-        if: inputs.language == 'go'
-        continue-on-error: ${{ inputs.continue-on-error }}
-        uses: actions/setup-go@v3
-        with:
-          go-version-file: "${{ inputs.directory }}/go.mod"
-          go-version: "${{ inputs.go-version }}"
-
-      - name: run golangci-lint (go)
-        if: inputs.language == 'go' && inputs.type == ''
-        continue-on-error: ${{ inputs.continue-on-error }}
-        uses: golangci/golangci-lint-action@0ad9a0988b3973e851ab0a07adf248ec2e100376 # @v3.3.1
-        with:
-          version: "${{ inputs.golangci-lint-version }}"
-          working-directory: "${{ inputs.directory }}"
-
-      # Markdown
-      - name: download markdownlint config
-        if: inputs.language == 'markdown'
-        run: |
-          curl \
-            https://raw.githubusercontent.com/${{ env.ORG_REPO }}/${{ env.ORG_REPO_REF }}/configs/default.markdownlint.jsonc \
-              > /tmp/default.markdownlint.jsonc
-
-      - name: run markdownlint-cli2
-        if: inputs.language == 'markdown'
-        continue-on-error: ${{ inputs.continue-on-error }}
-        uses: DavidAnson/markdownlint-cli2-action@v9
-        with:
-          command: config
-          globs: |
-            /tmp/default.markdownlint.jsonc
-            **/*.md
-
-      # Make
-      - name: run lint (make)
-        if: (inputs.language == 'python' && inputs.type == '') || inputs.type == 'make'
-        continue-on-error: ${{ inputs.continue-on-error }}
-        run: make lint
-        working-directory: "${{ inputs.directory }}"
-
-      # Just
-      - name: configure just, if required
-        if: inputs.type == 'just'
-        run: cargo install just
-
-      - name: run lint (just)
-        if: inputs.type == 'just'
-        continue-on-error: ${{ inputs.continue-on-error }}
-        run: just lint
-        working-directory: "${{ inputs.directory }}"
+      - name: Trunk Check
+        uses: trunk-io/trunk-action@9cf65e08e822e9842fd9ef7ed2a2bd9092de0986 # pin@v1
