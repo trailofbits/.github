@@ -2,7 +2,15 @@ on:
   workflow_call:
     inputs:
       type:
-        description: "use make or just to install project dependencies"
+        description: "Use make or just to install project dependencies"
+        required: false
+        type: string
+      trunk-arguments:
+        description: Extra arguments to pass to trunk
+        required: false
+        type: string
+      trunk-check-mode:
+        description: "Trunk check mode. Leave unset to autodetect changes. Set to 'all' to check the entire repository."
         required: false
         type: string
 
@@ -12,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # pin@v3
+      - uses: actions/checkout@v3
 
       - name: install just, if required
         if: inputs.type == 'just'
@@ -30,3 +38,6 @@ jobs:
 
       - name: trunk check
         uses: trunk-io/trunk-action@9cf65e08e822e9842fd9ef7ed2a2bd9092de0986 # pin@v1
+        with:
+          trunk-check-mode: ${{ inputs.trunk-check-mode }}
+          trunk-arguments: ${{ inputs.trunk-arguments }}
