@@ -39,5 +39,5 @@ jobs:
       - name: trunk check
         uses: trunk-io/trunk-action@9cf65e08e822e9842fd9ef7ed2a2bd9092de0986 # pin@v1
         with:
-          trunk-check-mode: ${{ inputs.trunk-check-mode }}
-          trunk-arguments: ${{ inputs.trunk-arguments }}
+          check-mode: ${{ inputs.trunk-check-mode }}
+          arguments: ${{ inputs.trunk-arguments }}
