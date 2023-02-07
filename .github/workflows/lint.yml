@@ -41,3 +41,10 @@ jobs:
         with:
           check-mode: ${{ inputs.trunk-check-mode }}
           arguments: ${{ inputs.trunk-arguments }}
+
+      - name: upload trunk failure logs, if any
+        if: success() || failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: .trunk/out
+          path: .trunk/out
