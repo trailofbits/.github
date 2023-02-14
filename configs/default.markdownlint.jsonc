@@ -70,7 +70,7 @@
         // Include code blocks
         "code_blocks": true,
         // Include tables
-        "tables": true,
+        "tables": false,
         // Include headings
         "headings": true,
         // Include headings
