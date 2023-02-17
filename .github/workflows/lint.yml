@@ -30,11 +30,11 @@ jobs:
 
       - name: install dependencies with make, if required
         if: inputs.type == 'make'
-        run: make deps
+        run: make dev
 
       - name: install dependencies with just, if required
         if: inputs.type == 'just'
-        run: just deps
+        run: just dev
 
       - name: trunk check
         uses: trunk-io/trunk-action@9cf65e08e822e9842fd9ef7ed2a2bd9092de0986 # pin@v1
