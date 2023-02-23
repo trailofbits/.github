@@ -2,6 +2,7 @@
 =======
 
 Public shared workflow templates and reusable workflows for Trail of Bits.
+You can find our public profile and repositories at https://github.com/trailofbits/ 
 
 **.github/workflows**
 
