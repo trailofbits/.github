@@ -24,9 +24,9 @@ jobs:
 
       - name: install just, if required
         if: inputs.type == 'just'
-        uses: extractions/setup-just@69d82fb0233557aec017ef13706851d0694e0f1d # pin@v1.6.0
-        with:
-          just-version: '1.13.0'
+        uses: extractions/setup-just@69d82fb0233557aec017ef13706851d0694e0f1d #pin@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: install dependencies with make, if required
         if: inputs.type == 'make'
@@ -37,8 +37,8 @@ jobs:
         run: just dev
 
       - name: trunk check
-        uses: trunk-io/trunk-action@9cf65e08e822e9842fd9ef7ed2a2bd9092de0986 # pin@v1
+        uses: trunk-io/trunk-action@4f077db8a20117a021b787adbf62729ae143c19e # pin@v1.0.8
         with:
+          trunk-token: ${{ secrets.TRUNK_TOKEN }}
           check-mode: ${{ inputs.trunk-check-mode }}
           arguments: ${{ inputs.trunk-arguments }}
-
