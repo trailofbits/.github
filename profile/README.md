@@ -1,5 +1,8 @@
-<img align="left" src="https://user-images.githubusercontent.com/3059210/174351167-046b45d8-7f3d-4a68-b745-d798b9d9f1a8.png#gh-light-mode-only" width="400">
-<img align="left" src="https://user-images.githubusercontent.com/3059210/174351169-843e1411-f904-4739-8b01-5c9a4dd5ae52.png#gh-dark-mode-only" width="400">
+<picture align="left">
+    <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/3059210/174351169-843e1411-f904-4739-8b01-5c9a4dd5ae52.png">
+    <source media="(prefers-color-scheme: light)" srcset="https://user-images.githubusercontent.com/3059210/174351167-046b45d8-7f3d-4a68-b745-d798b9d9f1a8.png">
+    <img alt="The Trail of Bits logo" src="https://user-images.githubusercontent.com/3059210/174351167-046b45d8-7f3d-4a68-b745-d798b9d9f1a8.png">
+</picture>
 
 Since 2012, Trail of Bits has helped secure some of the world's most targeted
 organizations and devices.
