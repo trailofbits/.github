@@ -38,7 +38,7 @@ jobs:
         run: just dev
 
       - name: trunk check
-        uses: trunk-io/trunk-action@v1.1.19
+        uses: trunk-io/trunk-action@4d5ecc89b2691705fd08c747c78652d2fc806a94 #pin@v1.1.19
         with:
           trunk-token: ${{ secrets.TRUNK_TOKEN }}
           check-mode: ${{ inputs.trunk-check-mode }}
